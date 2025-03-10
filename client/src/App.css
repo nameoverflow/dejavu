@@ -439,4 +439,60 @@ footer {
   border: 1px solid #fc8181;
   border-radius: 6px;
   color: #c53030;
+}
+
+/* PR merge actions */
+.pr-actions {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #eaecef;
+}
+
+.merge-button {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.merge-button.squash {
+  background-color: #8250df;
+  color: white;
+  border: none;
+}
+
+.merge-button.squash:hover {
+  background-color: #6f42c1;
+}
+
+.merge-button:disabled {
+  background-color: #d1c1e9;
+  cursor: not-allowed;
+}
+
+.merge-explanation {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #586069;
+  font-style: italic;
+}
+
+.merge-result {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.merge-result.success {
+  background-color: #f0fff4;
+  border: 1px solid #68d391;
+  color: #276749;
+}
+
+.merge-result.error {
+  background-color: #fff5f5;
+  border: 1px solid #fc8181;
+  color: #c53030;
 } 

@@ -371,6 +371,84 @@ app.get('/api/diagnostics', async (req, res) => {
   res.json(diagnosticInfo);
 });
 
+// Merge a pull request
+app.post('/api/merge-pr', async (req, res) => {
+  try {
+    const { prUrl, strategy = 'squash', deleteBranch = false } = req.body;
+    
+    if (!prUrl) {
+      return res.status(400).json({ message: 'Missing PR URL' });
+    }
+    
+    if (!['merge', 'squash', 'rebase'].includes(strategy)) {
+      return res.status(400).json({ 
+        message: 'Invalid merge strategy. Must be one of: merge, squash, rebase' 
+      });
+    }
+    
+    try {
+      // Parse and validate the PR URL
+      const { owner, repo, prNumber } = parsePrUrl(prUrl);
+      
+      // Construct the gh CLI command for merging
+      let command = `gh pr merge "${prNumber}" --repo ${owner}/${repo}`;
+      
+      // Add strategy flag
+      switch (strategy) {
+        case 'merge':
+          command += ' --merge';
+          break;
+        case 'squash':
+          command += ' --squash';
+          break;
+        case 'rebase':
+          command += ' --rebase';
+          break;
+      }
+      
+      // Add delete branch flag if requested
+      if (deleteBranch) {
+        command += ' --delete-branch';
+      }
+      
+      const { stdout, stderr } = await execAsync(command);
+      
+      console.log('Merge result:', stdout);
+      
+      if (stderr) {
+        console.error('Merge stderr:', stderr);
+      }
+      
+      // Get the authenticated user
+      const { stdout: authOutput } = await execAsync('gh auth status');
+      const usernameMatch = authOutput.match(/Logged in to github\.com as ([^\s]+)/);
+      const username = usernameMatch ? usernameMatch[1] : 'unknown';
+      
+      res.json({ 
+        message: `PR ${strategy === 'squash' ? 'squash merged' : strategy === 'rebase' ? 'rebased and merged' : 'merged'} successfully`, 
+        data: {
+          pr: `${owner}/${repo}#${prNumber}`,
+          user: username,
+          strategy: strategy,
+          branchDeleted: deleteBranch
+        }
+      });
+    } catch (error) {
+      // Handle PR URL parsing errors or other errors
+      if (error instanceof Error) {
+        return res.status(400).json({ message: error.message });
+      }
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error merging PR:', error);
+    res.status(500).json({ 
+      message: 'Failed to merge PR', 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    });
+  }
+});
+
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../../client/build')));

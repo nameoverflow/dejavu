@@ -50,6 +50,8 @@ const Home: React.FC = () => {
   const [diagnosticData, setDiagnosticData] = useState<any>(null);
   const [showDiagnostics, setShowDiagnostics] = useState<boolean>(false);
   const [runningDiagnostics, setRunningDiagnostics] = useState<boolean>(false);
+  const [merging, setMerging] = useState<boolean>(false);
+  const [mergeResult, setMergeResult] = useState<{success: boolean; message: string} | null>(null);
 
   // Check GitHub CLI status
   useEffect(() => {
@@ -240,6 +242,42 @@ const Home: React.FC = () => {
       });
     } finally {
       setRunningDiagnostics(false);
+    }
+  };
+
+  // Function to merge PR by squash
+  const mergePRBySquash = async () => {
+    if (!prUrl || !prDetails || prDetails.state !== 'OPEN' || prDetails.isDraft) {
+      return;
+    }
+    
+    setMerging(true);
+    setMergeResult(null);
+    
+    try {
+      const response = await axios.post('/api/merge-pr', {
+        prUrl,
+        strategy: 'squash', // Default to squash merge
+        deleteBranch: false // Don't delete branch by default
+      });
+      
+      setMergeResult({
+        success: true,
+        message: response.data.message
+      });
+      
+      // Refresh PR details after successful merge
+      // The PR should now be closed/merged
+      setTimeout(() => {
+        setDebouncedPrUrl(prUrl);
+      }, 1500);
+    } catch (error: any) {
+      setMergeResult({
+        success: false,
+        message: error.response?.data?.message || 'Failed to merge PR'
+      });
+    } finally {
+      setMerging(false);
     }
   };
 
@@ -467,6 +505,29 @@ const Home: React.FC = () => {
                 <div className="pr-description">
                   <strong>Description:</strong>
                   <p>{prDetails.body}</p>
+                </div>
+              )}
+              
+              {/* Merge button - only show for open PRs that are not drafts */}
+              {prDetails.state === 'OPEN' && !prDetails.isDraft && (
+                <div className="pr-actions">
+                  <button 
+                    onClick={mergePRBySquash}
+                    className="merge-button squash"
+                    disabled={merging}
+                  >
+                    {merging ? 'Merging...' : 'Squash & Merge PR'}
+                  </button>
+                  <p className="merge-explanation">
+                    This will squash all commits into a single commit and merge the PR.
+                  </p>
+                </div>
+              )}
+              
+              {/* Display merge result */}
+              {mergeResult && (
+                <div className={`merge-result ${mergeResult.success ? 'success' : 'error'}`}>
+                  <p>{mergeResult.message}</p>
                 </div>
               )}
               

@@ -1,6 +1,6 @@
 # GitHub PR Approver
 
-A simple web application for GitHub pull request reviews. This application uses the GitHub CLI tool to approve, comment on, or request changes to pull requests.
+A simple web application for GitHub pull request reviews. This application uses the GitHub CLI tool to approve, comment on, or request changes to pull requests, and even merge them.
 
 ## Features
 
@@ -11,8 +11,10 @@ A simple web application for GitHub pull request reviews. This application uses 
   - **Approve** - Mark the PR as approved
   - **Comment** - Add a comment to the PR without approval or rejection
   - **Request Changes** - Request changes before the PR can be merged
+- **Squash & Merge** - Ability to squash and merge pull requests
 - No need for OAuth setup
 - Leverages GitHub CLI credentials
+- Built-in diagnostics tool for troubleshooting authentication issues
 
 ## Technology Stack
 
@@ -71,12 +73,11 @@ This will start both the backend server on port 4000 and the frontend server on 
    - Author and creation date
    - PR description
    - Current review decision status
-5. Select the review action you want to perform:
-   - **Approve** - Approve the PR
-   - **Comment** - Add a comment to the PR
-   - **Request Changes** - Request changes on the PR
-6. For Comment and Request Changes actions, enter your comment in the text field
-7. Click the action button to perform the selected review action
+5. For open PRs, you can:
+   - **Review the PR**: Select a review action (approve, comment, request changes)
+   - **Squash & Merge**: Directly squash and merge the PR (when appropriate)
+6. For review actions that require comments, enter your comment in the text field
+7. Click the action button to perform the selected action
 8. The server will use the GitHub CLI to execute the action with the authenticated user's account
 
 ## How It Works
@@ -85,13 +86,26 @@ The application works by:
 1. Using the GitHub CLI (`gh`) that's installed on the server
 2. The CLI tool uses the authentication that was set up with `gh auth login`
 3. When you submit a PR URL, the app fetches PR details using `gh pr view` 
-4. When you select an action, the server runs a command like:
+4. When you select an action, the server runs commands like:
    ```
+   # For reviews:
    gh pr review owner/repo#123 --approve
    gh pr review owner/repo#123 --comment "Your comment here"
    gh pr review owner/repo#123 --request-changes "Your requested changes here"
+   
+   # For merging:
+   gh pr merge owner/repo#123 --squash
    ```
-5. This performs the selected review action as the user who is authenticated with the GitHub CLI
+5. This performs the selected action as the user who is authenticated with the GitHub CLI
+
+## Troubleshooting
+
+If you encounter authentication issues, the application provides a built-in diagnostics tool that:
+1. Checks GitHub CLI installation
+2. Verifies authentication status
+3. Tests API access
+4. Inspects authentication scopes
+5. Provides specific recommendations to fix issues
 
 ## Advantages Over OAuth
 
