@@ -35,11 +35,11 @@ COPY . .
 RUN cd client && npm run build && cd ../server && npm run build
 
 # Expose the server port
-EXPOSE 4000
+EXPOSE 3000
 
 # Set environment variables
 ENV NODE_ENV=production
-ENV PORT=4000
+ENV PORT=3000
 ENV FRONTEND_URL=http://localhost:4000
 
 # Start the application
