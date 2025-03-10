@@ -169,7 +169,7 @@ app.post('/api/review-pr', async (req, res) => {
       const { owner, repo, prNumber } = parsePrUrl(prUrl);
       
       // Construct the gh CLI command based on the action
-      let command = `gh pr review ${owner}/${repo}#${prNumber}`;
+      let command = `gh pr review "${prNumber}" --repo ${owner}/${repo}`;
       
       switch (action) {
         case 'approve':
@@ -241,7 +241,7 @@ app.get('/api/pr-details', async (req, res) => {
       
       // Use gh CLI to get PR details
       const { stdout, stderr } = await execAsync(
-        `gh pr view ${owner}/${repo}#${prNumber} --json title,state,author,createdAt,body,url,reviewDecision,isDraft`
+        `gh pr view ${prNumber} --repo ${owner}/${repo} --json title,state,author,createdAt,body,url,reviewDecision,isDraft`
       );
       
       if (stderr) {
