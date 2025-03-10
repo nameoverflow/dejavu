@@ -4,7 +4,7 @@
 set -e
 
 # Check if an alternate port was provided
-PORT=${1:-4000}
+PORT=${1:-3000}
 
 # Display info
 echo "Starting GitHub PR Approver container on port $PORT..."
@@ -14,8 +14,7 @@ echo ""
 
 # Run the container
 docker run -d \
-  --name github-pr-approver \
-  -p $PORT:4000 \
+  -p $PORT:3000 \
   -v gh-auth:/root/.config/gh \
   --restart unless-stopped \
   github-pr-approver
