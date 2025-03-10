@@ -32,36 +32,22 @@ A simple web application for GitHub pull request reviews. This application uses 
 
 1. Clone the repository:
 ```
-git clone https://github.com/yourusername/github-pr-approver.git
-cd github-pr-approver
+git clone https://github.com/nameoverflow/dejavu.git
+cd dejavu
+```
+2. Build the Docker image:
+
+```
+sh scripts/build.sh
 ```
 
-2. Install GitHub CLI on the server:
-   - Follow the installation instructions at: https://cli.github.com/
-   - Authenticate with GitHub:
-   ```
-   gh auth login
-   ```
-   - Make sure to authenticate with proper permissions for the repositories where you want to review PRs
+3. Start the Docker container:
 
-3. Set up environment variables:
-   - Create a `.env` file in the `server` directory (copy from `.env.example`)
-   ```
-   PORT=4000
-   FRONTEND_URL=http://localhost:3000
-   ```
-
-4. Install dependencies:
 ```
-npm run install-all
+sh scripts/start.sh
 ```
 
-5. Start the development servers:
-```
-npm start
-```
-
-This will start both the backend server on port 4000 and the frontend server on port 3000.
+This will start both the backend server on port 3000.
 
 ## Usage
 
